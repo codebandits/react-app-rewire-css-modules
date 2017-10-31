@@ -109,65 +109,99 @@ describe('CSS Modules rewire', () => {
         }
     }
 
-    describe('CSS loader', () => {
-        it('should enable CSS modules (development)', () => {
-            const result = subject(mockDevelopmentConfig)
-
-            expect(result.module.rules[1].oneOf[2].use[1].options).toEqual({
-                importLoaders: 1,
-                modules: true,
-                localIdentName: '[local]___[hash:base64:5]'
-            })
-        })
-
-        it('should enable CSS modules (production)', () => {
-            const result = subject(mockProductionConfig)
-
-            expect(result.module.rules[1].oneOf[2].loader[2].options).toEqual({
-                importLoaders: 1,
-                minimize: true,
-                sourceMap: true,
-                modules: true,
-                localIdentName: '[local]___[hash:base64:5]'
-            })
-        })
-    })
-
-    describe('SASS loader', () => {
+    describe('CSS loaders', () => {
         describe('development', () => {
 
             const result = subject(mockDevelopmentConfig)
             const cssLoader = result.module.rules[1].oneOf[2]
-            const sassLoader = result.module.rules[1].oneOf[3]
+            const cssModulesLoader = result.module.rules[1].oneOf[3]
+
+            it('should exclude modules from the regular loader', () => {
+                expect(cssLoader.exclude).toEqual(/\.module\.css$/)
+            })
+
+            it('should leave the regular loader configuration intact', () => {
+                expect(cssLoader.use[1].options).toEqual({
+                    importLoaders: 1
+                })
+            })
+
+            it('should create a modules loader', () => {
+                expect(cssModulesLoader.exclude).toBeUndefined()
+                expect(cssModulesLoader.use[1].options).toEqual({
+                    importLoaders: 1,
+                    modules: true,
+                    localIdentName: '[local]___[hash:base64:5]'
+                })
+            })
+        })
+
+        describe('production', () => {
+
+            const result = subject(mockProductionConfig)
+            const cssLoader = result.module.rules[1].oneOf[2]
+            const cssModulesLoader = result.module.rules[1].oneOf[3]
+
+            it('should exclude modules from the regular loader', () => {
+                expect(cssLoader.exclude).toEqual(/\.module\.css$/)
+            })
+
+            it('should leave the regular loader configuration intact', () => {
+                expect(cssLoader.loader[2].options).toEqual({
+                    importLoaders: 1,
+                    minimize: true,
+                    sourceMap: true
+                })
+            })
+
+            it('should create a modules loader', () => {
+                expect(cssModulesLoader.exclude).toBeUndefined()
+                expect(cssModulesLoader.loader[2].options).toEqual({
+                    importLoaders: 1,
+                    minimize: true,
+                    sourceMap: true,
+                    modules: true,
+                    localIdentName: '[local]___[hash:base64:5]'
+                })
+            })
+        })
+    })
+
+    describe('SASS loaders', () => {
+        describe('development', () => {
+
+            const result = subject(mockDevelopmentConfig)
+            const cssModulesLoader = result.module.rules[1].oneOf[3]
+            const sassModulesLoader = result.module.rules[1].oneOf[4]
 
             it('should configure the test regex', () => {
-                expect(result.module.rules[1].oneOf[3].test).toEqual(/\.s[ac]ss$/)
+                expect(sassModulesLoader.test).toEqual(/\.module\.s[ac]ss$/)
             })
 
             it('should build upon the CSS loader', () => {
-                expect(sassLoader.use.slice(0, 3)).toEqual(cssLoader.use)
+                expect(sassModulesLoader.use.slice(0, 3)).toEqual(cssModulesLoader.use)
             })
 
             it('should append the sass-loader', () => {
-                expect(sassLoader.use[3]).toContain('/sass-loader/')
+                expect(sassModulesLoader.use[3]).toContain('/sass-loader/')
             })
         })
 
         describe('production', () => {
             const result = subject(mockProductionConfig)
-            const cssLoader = result.module.rules[1].oneOf[2]
-            const sassLoader = result.module.rules[1].oneOf[3]
+            const cssModulesLoader = result.module.rules[1].oneOf[3]
+            const sassModulesLoader = result.module.rules[1].oneOf[4]
 
             it('should configure the test regex', () => {
-                expect(result.module.rules[1].oneOf[3].test).toEqual(/\.s[ac]ss$/)
+                expect(sassModulesLoader.test).toEqual(/\.module\.s[ac]ss$/)
             })
 
             it('should build upon the CSS loader', () => {
-                expect(sassLoader.loader.slice(0, 4)).toEqual(cssLoader.loader)
+                expect(sassModulesLoader.loader.slice(0, 4)).toEqual(cssModulesLoader.loader)
             })
 
             it('should append the sass-loader', () => {
-                expect(sassLoader.loader[4]).toContain('/sass-loader/')
+                expect(sassModulesLoader.loader[4]).toContain('/sass-loader/')
             })
         })
     })

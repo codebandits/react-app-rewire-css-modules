@@ -33,14 +33,18 @@ const addBeforeRule = (rulesSource, ruleMatcher, value) => {
 
 module.exports = function (config, env) {
     const cssRule = findRule(config.module.rules, cssRuleMatcher)
-    const cssRuleCssLoader = findRule(cssRule, cssLoaderMatcher)
+    const cssModulesRule = cloneDeep(cssRule)
+    cssRule.exclude = /\.module\.css$/
+    const cssModulesRuleCssLoader = findRule(cssModulesRule, cssLoaderMatcher)
 
-    cssRuleCssLoader.options = Object.assign({modules: true, localIdentName: '[local]___[hash:base64:5]'}, cssRuleCssLoader.options)
+    cssModulesRuleCssLoader.options = Object.assign({modules: true, localIdentName: '[local]___[hash:base64:5]'}, cssModulesRuleCssLoader.options)
 
-    const sassRule = cloneDeep(cssRule)
-    sassRule.test = /\.s[ac]ss$/
-    addAfterRule(sassRule, postcssLoaderMatcher, require.resolve('sass-loader'))
-    addBeforeRule(config.module.rules, fileLoaderMatcher, sassRule)
+    const sassModulesRule = cloneDeep(cssModulesRule)
+    sassModulesRule.test = /\.module\.s[ac]ss$/
+    addAfterRule(sassModulesRule, postcssLoaderMatcher, require.resolve('sass-loader'))
+
+    addBeforeRule(config.module.rules, fileLoaderMatcher, cssModulesRule)
+    addBeforeRule(config.module.rules, fileLoaderMatcher, sassModulesRule)
 
     return config
 }
