@@ -20,6 +20,16 @@ npm install --save-dev codebandits/react-app-rewire-css-modules sass-loader node
 
 ## Usage
 
+Use the following file extensions for any CSS Modules styles:
+
+- `*.module.css`
+- `*.module.sass`
+- `*.module.scss`
+
+Files with just a `*.css` file extension will load normally, without the CSS Modules loader.
+
+### Example
+
 In your react-app-rewired configuration:
 
 ```javascript
@@ -38,7 +48,7 @@ module.exports = function override(config, env) {
 In your React application:
 
 ```scss
-// src/App.scss
+// src/App.module.scss
 
 .app {
   color: aqua;
@@ -53,7 +63,7 @@ In your React application:
 // src/App.js
 
 import React from 'react';
-import styles from './App.scss';
+import styles from './App.module.scss';
 
 export default ({text}) => (
     <div className={styles.app}>{text}</div>
