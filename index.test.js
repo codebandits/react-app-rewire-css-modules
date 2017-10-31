@@ -171,37 +171,69 @@ describe('CSS Modules rewire', () => {
         describe('development', () => {
 
             const result = subject(mockDevelopmentConfig)
+            const cssLoader = result.module.rules[1].oneOf[2]
             const cssModulesLoader = result.module.rules[1].oneOf[3]
-            const sassModulesLoader = result.module.rules[1].oneOf[4]
+            const sassLoader = result.module.rules[1].oneOf[4]
+            const sassModulesLoader = result.module.rules[1].oneOf[5]
 
-            it('should configure the test regex', () => {
-                expect(sassModulesLoader.test).toEqual(/\.module\.s[ac]ss$/)
+            describe('regular loader', () => {
+                it('should configure a regular loader', () => {
+                    expect(sassLoader.test).toEqual(/\.s[ac]ss$/)
+                    expect(sassLoader.exclude).toEqual(/\.module\.s[ac]ss$/)
+                })
+                it('should build upon the CSS loader', () => {
+                    expect(sassLoader.use.slice(0, 3)).toEqual(cssLoader.use)
+                })
+                it('should append the sass-loader', () => {
+                    expect(sassLoader.use[3]).toContain('/sass-loader/')
+                })
             })
 
-            it('should build upon the CSS loader', () => {
-                expect(sassModulesLoader.use.slice(0, 3)).toEqual(cssModulesLoader.use)
-            })
-
-            it('should append the sass-loader', () => {
-                expect(sassModulesLoader.use[3]).toContain('/sass-loader/')
+            describe('modules loader', () => {
+                it('should configure a modules loader', () => {
+                    expect(sassModulesLoader.test).toEqual(/\.module\.s[ac]ss$/)
+                })
+                it('should build upon the CSS loader', () => {
+                    expect(sassModulesLoader.use.slice(0, 3)).toEqual(cssModulesLoader.use)
+                })
+                it('should append the sass-loader', () => {
+                    expect(sassModulesLoader.use[3]).toContain('/sass-loader/')
+                })
             })
         })
 
         describe('production', () => {
             const result = subject(mockProductionConfig)
+            const cssLoader = result.module.rules[1].oneOf[2]
             const cssModulesLoader = result.module.rules[1].oneOf[3]
-            const sassModulesLoader = result.module.rules[1].oneOf[4]
+            const sassLoader = result.module.rules[1].oneOf[4]
+            const sassModulesLoader = result.module.rules[1].oneOf[5]
 
-            it('should configure the test regex', () => {
-                expect(sassModulesLoader.test).toEqual(/\.module\.s[ac]ss$/)
+            describe('regular loader', () => {
+                it('should configure a regular loader', () => {
+                    expect(sassLoader.test).toEqual(/\.s[ac]ss$/)
+                    expect(sassLoader.exclude).toEqual(/\.module\.s[ac]ss$/)
+                })
+                it('should build upon the CSS loader', () => {
+                    expect(sassLoader.loader.slice(0, 4)).toEqual(cssLoader.loader)
+                })
+                it('should append the sass-loader', () => {
+                    expect(sassLoader.loader[4]).toContain('/sass-loader/')
+                })
             })
 
-            it('should build upon the CSS loader', () => {
-                expect(sassModulesLoader.loader.slice(0, 4)).toEqual(cssModulesLoader.loader)
-            })
+            describe('modules loader', () => {
+                it('should configure the test regex', () => {
+                    expect(sassModulesLoader.test).toEqual(/\.module\.s[ac]ss$/)
+                })
 
-            it('should append the sass-loader', () => {
-                expect(sassModulesLoader.loader[4]).toContain('/sass-loader/')
+                it('should build upon the CSS loader', () => {
+                    expect(sassModulesLoader.loader.slice(0, 4)).toEqual(cssModulesLoader.loader)
+                })
+
+                it('should append the sass-loader', () => {
+                    expect(sassModulesLoader.loader[4]).toContain('/sass-loader/')
+                })
             })
         })
     })

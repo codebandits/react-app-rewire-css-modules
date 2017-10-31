@@ -26,7 +26,11 @@ Use the following file extensions for any CSS Modules styles:
 - `*.module.sass`
 - `*.module.scss`
 
-Files with just a `*.css` file extension will load normally, without the CSS Modules loader.
+Files with the following file extensions will load normally, without the CSS Modules loader:
+
+- `*.css`
+- `*.sass`
+- `*.scss`
 
 ### Example
 
