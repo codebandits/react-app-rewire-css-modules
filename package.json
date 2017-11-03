@@ -1,19 +1,18 @@
 {
-  "name": "react-app-rewire-css-modules",
-  "version": "1.0.0",
-  "private": true,
+  "name": "react-app-rewire-less-modules",
+  "version": "1.1.0",
   "scripts": {
     "test": "jest"
   },
   "devDependencies": {
-    "jest": "^21.2.1",
-    "sass-loader": "^6.0.6"
+    "jest": "^21.2.1"
   },
   "dependencies": {
-    "lodash.clonedeep": "^4.5.0"
+    "lodash.clonedeep": "^4.5.0",
+    "less": "^2.7.3",
+    "less-loader": "^4.0.5"
   },
   "peerDependencies": {
-    "node-sass": "^4.5.3",
-    "sass-loader": "^6.0.6"
+    "react-app-rewired": "^1.3.6"
   }
 }

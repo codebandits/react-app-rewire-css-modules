@@ -1,36 +1,35 @@
-# react-app-rewire-css-modules
+# react-app-rewire-less-modules
 
-Add [CSS Module](https://github.com/css-modules/css-modules) loaders to your [create-react-app](https://github.com/facebookincubator/create-react-app) via [react-app-rewired](https://github.com/timarney/react-app-rewired).
+Add [CSS Module](https://github.com/css-modules/css-modules) loaders to your
+[create-react-app](https://github.com/facebookincubator/create-react-app) via
+[react-app-rewired](https://github.com/timarney/react-app-rewired).
 
-CSS Module styles can be written in CSS or SASS.
+CSS Module styles can be written in CSS or LESS.
 
 ## Installation
 
-This package is not yet published to the npm registry. Install from GitHub:
-
 ```
-yarn add --dev codebandits/react-app-rewire-css-modules sass-loader node-sass
+npm install --save-dev react-app-rewire-less-modules
 ```
 
 OR
 
 ```
-npm install --save-dev codebandits/react-app-rewire-css-modules sass-loader node-sass
+yarn add --dev react-app-rewire-less-modules
 ```
 
 ## Usage
 
 Use the following file extensions for any CSS Modules styles:
 
-- `*.module.css`
-- `*.module.sass`
-- `*.module.scss`
+* `*.module.css`
+* `*.module.less`
 
-Files with the following file extensions will load normally, without the CSS Modules loader:
+Files with the following file extensions will load normally, without the CSS
+Modules loader:
 
-- `*.css`
-- `*.sass`
-- `*.scss`
+* `*.css`
+* `*.less`
 
 ### Example
 
@@ -39,24 +38,30 @@ In your react-app-rewired configuration:
 ```javascript
 /* config-overrides.js */
 
-const rewireCssModules = require('react-app-rewire-css-modules');
+const rewireLess = require("react-app-rewire-less-modules");
 
 module.exports = function override(config, env) {
-    // ...
-    config = rewireCssModules(config, env);
-    // ...
-    return config;
-}
+  // ...
+  config = rewireLess(config, env);
+  // with loaderOptions
+  // config = rewireLess.withLoaderOptions('', someLoaderOptions)(config, env);
+  // with override localIdentName
+  // config = rewireLess.withLoaderOptions(
+  //   `${env === "production" ? "foobar" : "[local]"}-[hash:base64:8]`,
+  //)(config, env);
+  // ...
+  return config;
+};
 ```
 
 In your React application:
 
-```scss
-// src/App.module.scss
+```less
+// src/App.module.less
 
 .app {
   color: aqua;
-  
+
   &:hover {
     color: lawngreen;
   }
