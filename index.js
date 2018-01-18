@@ -1,88 +1,69 @@
-const cloneDeep = require("lodash.clonedeep");
 const path = require("path");
+const { getLoader, loaderNameMatches } = require("react-app-rewired");
 
-const ruleChildren = loader =>
-  loader.use ||
-  loader.oneOf ||
-  (Array.isArray(loader.loader) && loader.loader) ||
-  [];
+const lessExtension = /\.less$/;
+const lessModuleExtension = /\.module.less$/;
 
-const findIndexAndRules = (rulesSource, ruleMatcher) => {
-  let result = undefined;
-  const rules = Array.isArray(rulesSource)
-    ? rulesSource
-    : ruleChildren(rulesSource);
-  rules.some(
-    (rule, index) =>
-      (result = ruleMatcher(rule)
-        ? { index, rules }
-        : findIndexAndRules(ruleChildren(rule), ruleMatcher))
-  );
-  return result;
-};
-
-const findRule = (rulesSource, ruleMatcher) => {
-  const { index, rules } = findIndexAndRules(rulesSource, ruleMatcher);
-  return rules[index];
-};
-
-const cssRuleMatcher = rule =>
-  rule.test && String(rule.test) === String(/\.css$/);
-
-const createLoaderMatcher = loader => rule =>
-  rule.loader && rule.loader.indexOf(`${path.sep}${loader}${path.sep}`) !== -1;
-const cssLoaderMatcher = createLoaderMatcher("css-loader");
-const postcssLoaderMatcher = createLoaderMatcher("postcss-loader");
-const fileLoaderMatcher = createLoaderMatcher("file-loader");
-
-const addAfterRule = (rulesSource, ruleMatcher, value) => {
-  const { index, rules } = findIndexAndRules(rulesSource, ruleMatcher);
-  rules.splice(index + 1, 0, value);
-};
-
-const addBeforeRule = (rulesSource, ruleMatcher, value) => {
-  const { index, rules } = findIndexAndRules(rulesSource, ruleMatcher);
-  rules.splice(index, 0, value);
-};
-
-function createRewireLess(
-  localIdentName = `[local]___[hash:base64:5]`,
-  lessLoaderOptions = {}
-) {
+function createRewireLess(lessLoaderOptions = {}) {
   return function(config, env) {
-    const cssRule = findRule(config.module.rules, cssRuleMatcher);
-    const lessRule = cloneDeep(cssRule);
-    const cssModulesRule = cloneDeep(cssRule);
+    // Exclude all less files (including module files) from file-loader
+    const fileLoader = getLoader(config.module.rules, rule => {
+      return loaderNameMatches(rule, "file-loader") && rule.exclude;
+    });
+    fileLoader.exclude.push(lessExtension);
 
-    cssRule.exclude = /\.module\.css$/;
-    cssModulesRule.test = /\.module\.css$/;
+    const createRule = (rule, cssRules) => {
+      if (env === "production") {
+        return {
+          ...rule,
+          loader: [
+            ...cssRules.loader,
+            { loader: "less-loader", options: lessLoaderOptions },
+          ],
+        };
+      } else {
+        return {
+          ...rule,
+          use: [
+            ...cssRules.use,
+            { loader: "less-loader", options: lessLoaderOptions },
+          ],
+        };
+      }
+    };
 
-    const cssModulesRuleCssLoader = findRule(cssModulesRule, cssLoaderMatcher);
-    cssModulesRuleCssLoader.options = Object.assign(
+    const lessRules = createRule(
       {
-        modules: true,
-        localIdentName
+        test: lessExtension,
+        exclude: lessModuleExtension,
       },
-      cssModulesRuleCssLoader.options
+      // Get a copy of the CSS loader
+      getLoader(
+        config.module.rules,
+        rule => String(rule.test) === String(/\.css$/),
+      ),
     );
-    addBeforeRule(config.module.rules, fileLoaderMatcher, cssModulesRule);
 
-    lessRule.test = /\.less$/;
-    lessRule.exclude = /\.module\.less$/;
-    addAfterRule(lessRule, postcssLoaderMatcher, {
-      loader: require.resolve("less-loader"),
-      options: lessLoaderOptions
-    });
-    addBeforeRule(config.module.rules, fileLoaderMatcher, lessRule);
+    const lessModuleRules = createRule(
+      { test: lessModuleExtension },
+      // Get a copy of the CSS module loader
+      getLoader(
+        config.module.rules,
+        rule => String(rule.test) === String(/\.module\.css$/),
+      ),
+    );
 
-    const lessModulesRule = cloneDeep(cssModulesRule);
-    lessModulesRule.test = /\.module\.less$/;
-
-    addAfterRule(lessModulesRule, postcssLoaderMatcher, {
-      loader: require.resolve("less-loader"),
-      options: lessLoaderOptions
-    });
-    addBeforeRule(config.module.rules, fileLoaderMatcher, lessModulesRule);
+    const oneOfRule = config.module.rules.find(
+      rule => rule.oneOf !== undefined,
+    );
+    if (oneOfRule) {
+      oneOfRule.oneOf.unshift(lessRules);
+      oneOfRule.oneOf.unshift(lessModuleRules);
+    } else {
+      // Fallback to previous behaviour of adding to the end of the rules list.
+      config.module.rules.push(lessRules);
+      config.module.rules.push(lessModuleRules);
+    }
 
     return config;
   };

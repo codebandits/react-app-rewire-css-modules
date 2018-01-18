@@ -1,10 +1,10 @@
 # react-app-rewire-less-modules
 
-Add [CSS Module](https://github.com/css-modules/css-modules) loaders to your
-[create-react-app](https://github.com/facebookincubator/create-react-app) via
+Add Less and Less module support to
+[create-react-app](https://github.com/facebookincubator/create-react-app) 2.0 via
 [react-app-rewired](https://github.com/timarney/react-app-rewired).
 
-CSS Module styles can be written in CSS or LESS.
+`Create react app 2.0` already supports CSS modules. This extension adds support for regular less files and *.module.less files.
 
 ## Installation
 
@@ -20,15 +20,13 @@ yarn add --dev react-app-rewire-less-modules
 
 ## Usage
 
-Use the following file extensions for any CSS Modules styles:
+Use the following file extensions for any Less module styles:
 
-* `*.module.css`
 * `*.module.less`
 
 Files with the following file extensions will load normally, without the CSS
 Modules loader:
 
-* `*.css`
 * `*.less`
 
 ### Example
@@ -41,15 +39,16 @@ In your react-app-rewired configuration:
 const rewireLess = require("react-app-rewire-less-modules");
 
 module.exports = function override(config, env) {
-  // ...
+  
   config = rewireLess(config, env);
+  
   // with loaderOptions
-  // config = rewireLess.withLoaderOptions('', someLoaderOptions)(config, env);
-  // with override localIdentName
-  // config = rewireLess.withLoaderOptions(
-  //   `${env === "production" ? "foobar" : "[local]"}-[hash:base64:8]`,
-  //)(config, env);
-  // ...
+  config = rewireLess.withLoaderOptions({
+      modifyVars: {
+        "@primary-color": "#1890ff",
+      },
+    })(config, env);
+
   return config;
 };
 ```
@@ -72,7 +71,7 @@ In your React application:
 // src/App.js
 
 import React from 'react';
-import styles from './App.module.scss';
+import styles from './App.module.less';
 
 export default ({text}) => (
     <div className={styles.app}>{text}</div>

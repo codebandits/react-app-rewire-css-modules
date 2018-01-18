@@ -1,18 +1,11 @@
 {
   "name": "react-app-rewire-less-modules",
-  "version": "1.1.0",
-  "scripts": {
-    "test": "jest"
-  },
-  "devDependencies": {
-    "jest": "^21.2.1"
-  },
+  "version": "1.2.0",
   "dependencies": {
-    "lodash.clonedeep": "^4.5.0",
     "less": "^2.7.3",
     "less-loader": "^4.0.5"
   },
   "peerDependencies": {
-    "react-app-rewired": "^1.3.6"
+    "react-app-rewired": "^1.4.0"
   }
 }
