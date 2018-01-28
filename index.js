@@ -1,5 +1,4 @@
 const path = require('path')
-
 const cloneDeep = require('lodash.clonedeep')
 
 const ruleChildren = (loader) => loader.use || loader.oneOf || Array.isArray(loader.loader) && loader.loader || []
