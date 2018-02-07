@@ -45,12 +45,12 @@ module.exports = function (config, env) {
 
     sassRule.test = /\.s[ac]ss$/
     sassRule.exclude = /\.module\.s[ac]ss$/
-    addAfterRule(sassRule, postcssLoaderMatcher, require.resolve('sass-loader'))
+    addAfterRule(sassRule, postcssLoaderMatcher, { loader: require.resolve('sass-loader') })
     addBeforeRule(config.module.rules, fileLoaderMatcher, sassRule)
 
     const sassModulesRule = cloneDeep(cssModulesRule)
     sassModulesRule.test = /\.module\.s[ac]ss$/
-    addAfterRule(sassModulesRule, postcssLoaderMatcher, require.resolve('sass-loader'))
+    addAfterRule(sassModulesRule, postcssLoaderMatcher, { loader: require.resolve('sass-loader') })
     addBeforeRule(config.module.rules, fileLoaderMatcher, sassModulesRule)
 
     return config
