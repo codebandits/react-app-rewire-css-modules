@@ -238,4 +238,75 @@ describe('CSS Modules rewire', () => {
             })
         })
     })
+
+    describe('LESS loaders', () => {
+        describe('development', () => {
+
+            const result = subject(mockDevelopmentConfig)
+            const cssLoader = result.module.rules[1].oneOf[2]
+            const cssModulesLoader = result.module.rules[1].oneOf[3]
+            const lessLoader = result.module.rules[1].oneOf[6]
+            const lessssModulesLoader = result.module.rules[1].oneOf[7]
+
+            describe('regular loader', () => {
+                it('should configure a regular loader', () => {
+                    expect(lessLoader.test).toEqual(/\.less$/)
+                    expect(lessLoader.exclude).toEqual(/\.module\.less$/)
+                })
+                it('should build upon the CSS loader', () => {
+                    expect(lessLoader.use.slice(0, 3)).toEqual(cssLoader.use)
+                })
+                it('should append the less-loader', () => {
+                    expect(lessLoader.use[3]).toContain(`${path.sep}less-loader${path.sep}`)
+                })
+            })
+
+            describe('modules loader', () => {
+                it('should configure a modules loader', () => {
+                    expect(lessssModulesLoader.test).toEqual(/\.module\.less$/)
+                })
+                it('should build upon the CSS loader', () => {
+                    expect(lessssModulesLoader.use.slice(0, 3)).toEqual(cssModulesLoader.use)
+                })
+                it('should append the less-loader', () => {
+                    expect(lessssModulesLoader.use[3]).toContain(`${path.sep}less-loader${path.sep}`)
+                })
+            })
+        })
+
+        describe('production', () => {
+            const result = subject(mockProductionConfig)
+            const cssLoader = result.module.rules[1].oneOf[2]
+            const cssModulesLoader = result.module.rules[1].oneOf[3]
+            const lessLoader = result.module.rules[1].oneOf[6]
+            const lessssModulesLoader = result.module.rules[1].oneOf[7]
+
+            describe('regular loader', () => {
+                it('should configure a regular loader', () => {
+                    expect(lessLoader.test).toEqual(/\.less$/)
+                    expect(lessLoader.exclude).toEqual(/\.module\.less$/)
+                })
+                it('should build upon the CSS loader', () => {
+                    expect(lessLoader.loader.slice(0, 4)).toEqual(cssLoader.loader)
+                })
+                it('should append the less-loader', () => {
+                    expect(lessLoader.loader[4]).toContain(`${path.sep}less-loader${path.sep}`)
+                })
+            })
+
+            describe('modules loader', () => {
+                it('should configure the test regex', () => {
+                    expect(lessssModulesLoader.test).toEqual(/\.module\.less$/)
+                })
+
+                it('should build upon the CSS loader', () => {
+                    expect(lessssModulesLoader.loader.slice(0, 4)).toEqual(cssModulesLoader.loader)
+                })
+
+                it('should append the less-loader', () => {
+                    expect(lessssModulesLoader.loader[4]).toContain(`${path.sep}less-loader${path.sep}`)
+                })
+            })
+        })
+    })
 })

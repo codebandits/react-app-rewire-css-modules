@@ -7,13 +7,16 @@
   },
   "devDependencies": {
     "jest": "^21.2.1",
-    "sass-loader": "^6.0.6"
+    "sass-loader": "^6.0.6",
+    "less-loader": "^4.1.0"
   },
   "dependencies": {
     "lodash.clonedeep": "^4.5.0"
   },
   "peerDependencies": {
     "node-sass": "^4.5.3",
-    "sass-loader": "^6.0.6"
+    "sass-loader": "^6.0.6",
+    "less": "^3.9.0",
+    "less-loader": "^4.1.0"
   }
 }
