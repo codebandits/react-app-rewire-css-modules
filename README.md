@@ -1,3 +1,7 @@
+# Archive Notice
+
+This project is archived. Create React App v2 introduced [support for CSS Modules](https://facebook.github.io/create-react-app/docs/adding-a-css-modules-stylesheet). We recommend using the native support for CSS Modules instead of this project.
+
 # react-app-rewire-css-modules
 
 Add [CSS Module](https://github.com/css-modules/css-modules) loaders to your [create-react-app](https://github.com/facebookincubator/create-react-app) via [react-app-rewired](https://github.com/timarney/react-app-rewired).
